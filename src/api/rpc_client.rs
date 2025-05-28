@@ -1,10 +1,9 @@
-
-use std::str::FromStr;
 use solana_client::rpc_client::RpcClient;
 use solana_client::rpc_config::RpcProgramAccountsConfig;
-use solana_client::rpc_filter::{MemcmpEncodedBytes, RpcFilterType, Memcmp};
+use solana_client::rpc_filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType};
 use solana_sdk::account::Account;
 use solana_sdk::pubkey::Pubkey;
+use std::str::FromStr;
 
 pub struct HeliusRpc {
     connection: RpcClient,
@@ -38,24 +37,31 @@ impl HeliusRpc {
         return self.connection.poll_for_signature(&signature);
     }
 
-    pub fn get_stake_accounts(&self, address: &String) -> solana_client::client_error::Result<Vec<(Pubkey, Account)>> {
+    pub fn get_stake_accounts(
+        &self,
+        address: &String,
+    ) -> solana_client::client_error::Result<Vec<(Pubkey, Account)>> {
         return self.connection.get_program_accounts_with_config(
             &Pubkey::from_str("Stake11111111111111111111111111111111111111").unwrap(),
-            RpcProgramAccountsConfig{
+            RpcProgramAccountsConfig {
                 filters: Some(vec![
                     RpcFilterType::DataSize(200),
                     RpcFilterType::Memcmp(Memcmp::new(
                         44,
-                        MemcmpEncodedBytes::Bytes(Vec::from(address.as_bytes()))
-                    ))
+                        MemcmpEncodedBytes::Bytes(Vec::from(address.as_bytes())),
+                    )),
                 ]),
                 account_config: Default::default(),
                 with_context: None,
-            }
+                sort_results: None,
+            },
         );
     }
 
-    pub fn get_token_holders(&self, mint_address: &String) -> solana_client::client_error::Result<Vec<(Pubkey, Account)>> {
+    pub fn get_token_holders(
+        &self,
+        mint_address: &String,
+    ) -> solana_client::client_error::Result<Vec<(Pubkey, Account)>> {
         return self.connection.get_program_accounts_with_config(
             &Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap(),
             RpcProgramAccountsConfig {
@@ -63,12 +69,13 @@ impl HeliusRpc {
                     RpcFilterType::DataSize(165),
                     RpcFilterType::Memcmp(Memcmp::new(
                         0,
-                        MemcmpEncodedBytes::Bytes(Vec::from(mint_address.as_bytes()))
-                    ))
+                        MemcmpEncodedBytes::Bytes(Vec::from(mint_address.as_bytes())),
+                    )),
                 ]),
                 account_config: Default::default(),
                 with_context: None,
-            }
+                sort_results: None,
+            },
         );
     }
 }
